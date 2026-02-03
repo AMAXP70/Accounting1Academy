@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أكاديمية المحاسبة</title>
+    <link rel="stylesheet" href="assets/css/index-style.css">
+</head>
+<body>
+
+    <!-- ======== الهيدر ======== -->
+    <header class="header">
+     
+        <nav>
+            <button id="sidebarToggle" class="menu-btn">☰ القائمة</button>
+            <a href="login.html" class="btn-login">تسجيل الدخول</a>
+        </nav>
+		 <div class="logo">
+    <img src="assets/images/logo.png" alt="Logo" class="site-logo">
+    <span class="site-name">أكاديمية المحاسبة</span>
+</div>
+    </header>
+	
+
+    <!-- ======== القائمة الجانبية ======== -->
+    <aside id="sidebar" class="sidebar">
+        <button id="closeSidebar" class="close-btn">×</button>
+        <ul>
+            <li><a href="#about">عن الأكاديمية</a></li>
+            <li><a href="#courses">الكورسات</a></li>
+            <li><a href="#contact">اتصل بنا</a></li>
+        </ul>
+    </aside>
+
+    <!-- Overlay -->
+    <div id="overlay"></div>
+
+    <!-- ======== المحتوى الرئيسي ======== -->
+    <main>
+        <!-- قسم الترحيب -->
+        <section class="hero">
+            <h1>أهلاً بك في أكاديمية المحاسبة</h1>
+            <p>تعلم المحاسبة بأسلوب حديث وسهل. انضم الآن وابدأ رحلتك التعليمية بثقة!</p>
+        </section>
+
+        <!-- أحدث الكورسات -->
+        <section id="courses" class="courses-section">
+            <h2>أحدث الكورسات</h2>
+            <div id="latestCourses" class="courses-container">
+                <!-- الكورسات تظهر هنا بواسطة JS -->
+            </div>
+        </section>
+
+        <!-- قسم About -->
+        <section id="about" class="about-section">
+            <h2>عن الأكاديمية</h2>
+            <p>أكاديمية المحاسبة تقدم لك محتوى تعليمي شامل لكل المستويات، مع دروس فيديو تفاعلية وتمارين عملية لتطوير مهاراتك في المحاسبة والمالية.</p>
+        </section>
+
+        <!-- قسم التواصل -->
+        <section id="contact" class="contact-section">
+            <h2>تواصل معنا</h2>
+            <p>البريد الإلكتروني: support@academy.com</p>
+            <p>الهاتف: 0123456789</p>
+        </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <p>© 2026 أكاديمية المحاسبة | جميع الحقوق محفوظة</p>
+        <p>للدعم والمساعدة: support@academy.com</p>
+    </footer>
+
+    <script src="assets/js/index.js"></script>
+    <script>
+        // Sidebar & Overlay
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+        const toggleBtn = document.getElementById("sidebarToggle");
+        const closeBtn = document.getElementById("closeSidebar");
+
+        function openSidebar() {
+            sidebar.classList.add("active");
+            overlay.classList.add("active");
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+        }
+
+        toggleBtn.addEventListener("click", openSidebar);
+        closeBtn.addEventListener("click", closeSidebar);
+        overlay.addEventListener("click", closeSidebar);
+    </script>
+</body>
+</html>

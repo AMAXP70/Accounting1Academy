@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الأدمن - أكاديمية المحاسبة</title>
+<link rel="stylesheet" href="assets/css/admin-style.css">
+</head>
+<body class="admin-page">
+
+<header id="admin-header" class="header">
+  <div class="logo">أكاديمية المحاسبة</div>
+  <nav>
+    <span id="admin-name">Admin</span>
+    <button id="admin-logoutBtn" class="btn-logout">تسجيل الخروج</button>
+    <button id="admin-editProfileBtn" class="btn-edit">تعديل بيانات الأدمن</button>
+  </nav>
+</header>
+
+<main>
+  <!-- إدارة الطلاب -->
+  <section id="students-section" class="admin-section">
+    <h2>إدارة الطلاب</h2>
+    <form id="admin-addStudentForm">
+      <input type="text" id="admin-studentName" placeholder="اسم الطالب" required>
+      <input type="email" id="admin-studentEmail" placeholder="البريد الإلكتروني" required>
+      <input type="password" id="admin-studentPassword" placeholder="كلمة المرور" required>
+      <button type="submit">إضافة طالب</button>
+    </form>
+    <div id="admin-studentsList" class="students-list"></div>
+  </section>
+
+  <!-- إدارة الكورسات والدروس -->
+  <section id="courses-section" class="admin-section">
+    <h2>إدارة الكورسات والدروس</h2>
+    <form id="admin-addCourseForm">
+      <input type="text" id="admin-courseTitle" placeholder="اسم الكورس" required>
+      <button type="submit">إضافة كورس</button>
+    </form>
+
+    <form id="admin-addLessonForm">
+      <select id="admin-selectCourse" required>
+        <option value="">اختر الكورس</option>
+      </select>
+      <input type="text" id="admin-lessonTitle" placeholder="اسم الدرس" required>
+      <input type="text" id="admin-lessonVideo" placeholder="رابط فيديو Google Drive" required>
+      <button type="submit">إضافة درس</button>
+    </form>
+
+    <div id="admin-coursesList" class="courses-list"></div>
+    <div id="admin-lessonsList" class="lessons-list"></div>
+  </section>
+</main>
+
+<footer id="admin-footer" class="footer">
+<p>© 2026 أكاديمية المحاسبة | جميع الحقوق محفوظة</p>
+<p>للدعم: support@academy.com</p>
+</footer>
+
+<script>
+// التحقق من دخول الأدمن
+if(localStorage.getItem("role") !== "admin") window.location.href="login.html";
+
+// بيانات الأدمن
+let admins = JSON.parse(localStorage.getItem("admins") || "[]");
+let students = JSON.parse(localStorage.getItem("students") || "[]");
+let courses = JSON.parse(localStorage.getItem("courses") || "[]");
+
+let currentAdmin = admins[0] || {name:"Admin", email:"admin@academy.com", password:"admin123"};
+document.getElementById("admin-name").textContent = currentAdmin.name;
+
+// تسجيل الخروج
+document.getElementById("admin-logoutBtn").addEventListener("click", ()=>{
+    localStorage.removeItem("role");
+    localStorage.removeItem("admin_name");
+    window.location.href="login.html";
+});
+
+// تعديل بيانات الأدمن
+document.getElementById("admin-editProfileBtn").addEventListener("click", ()=>{
+    let newName = prompt("الاسم الجديد:", currentAdmin.name);
+    let newEmail = prompt("البريد الجديد:", currentAdmin.email);
+    let newPass = prompt("كلمة السر الجديدة:", currentAdmin.password);
+    if(newName && newEmail && newPass){
+        currentAdmin.name = newName;
+        currentAdmin.email = newEmail;
+        currentAdmin.password = newPass;
+        admins[0] = currentAdmin;
+        localStorage.setItem("admins", JSON.stringify(admins));
+        document.getElementById("admin-name").textContent = newName;
+        alert("تم تعديل بيانات الأدمن بنجاح!");
+    }
+});
+
+// إدارة الطلاب
+const addStudentForm = document.getElementById("admin-addStudentForm");
+const studentsList = document.getElementById("admin-studentsList");
+
+function renderStudents(){
+    studentsList.innerHTML="";
+    students.forEach((s,i)=>{
+        let div = document.createElement("div");
+        div.textContent = `${s.name} - ${s.email}`;
+        let editBtn = document.createElement("button");
+        editBtn.textContent="تعديل";
+        editBtn.className="btn-edit";
+        editBtn.onclick=()=>{
+            let newName = prompt("الاسم الجديد:", s.name);
+            let newEmail = prompt("البريد الجديد:", s.email);
+            let newPass = prompt("كلمة السر الجديدة:", s.password);
+            if(newName && newEmail && newPass){
+                students[i].name=newName;
+                students[i].email=newEmail;
+                students[i].password=newPass;
+                localStorage.setItem("students",JSON.stringify(students));
+                renderStudents();
+            }
+        };
+        let deleteBtn = document.createElement("button");
+        deleteBtn.textContent="حذف";
+        deleteBtn.className="btn-delete";
+        deleteBtn.onclick=()=>{
+            if(confirm(`هل تريد حذف الطالب ${s.name}?`)){
+                students.splice(i,1);
+                localStorage.setItem("students",JSON.stringify(students));
+                renderStudents();
+            }
+        };
+        div.appendChild(editBtn);
+        div.appendChild(deleteBtn);
+        studentsList.appendChild(div);
+    });
+}
+
+addStudentForm.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    let name=document.getElementById("admin-studentName").value.trim();
+    let email=document.getElementById("admin-studentEmail").value.trim();
+    let password=document.getElementById("admin-studentPassword").value.trim();
+    if(name && email && password){
+        students.push({name,email,password,courses:[]});
+        localStorage.setItem("students",JSON.stringify(students));
+        addStudentForm.reset();
+        renderStudents();
+    }
+});
+
+renderStudents();
+
+// إدارة الكورسات والدروس
+const addCourseForm=document.getElementById("admin-addCourseForm");
+const courseTitleInput=document.getElementById("admin-courseTitle");
+const coursesList=document.getElementById("admin-coursesList");
+const addLessonForm=document.getElementById("admin-addLessonForm");
+const selectCourse=document.getElementById("admin-selectCourse");
+const lessonTitleInput=document.getElementById("admin-lessonTitle");
+const lessonVideoInput=document.getElementById("admin-lessonVideo");
+const lessonsList=document.getElementById("admin-lessonsList");
+
+function updateCourseSelect(){
+    selectCourse.innerHTML="<option value=''>اختر الكورس</option>";
+    courses.forEach((c,i)=>{
+        let option=document.createElement("option");
+        option.value=i;
+        option.textContent=c.name;
+        selectCourse.appendChild(option);
+    });
+}
+updateCourseSelect();
+
+function renderCourses(){
+    coursesList.innerHTML="";
+    lessonsList.innerHTML="";
+    courses.forEach((c,i)=>{
+        let div=document.createElement("div");
+        div.textContent=c.name;
+
+        let deleteBtn=document.createElement("button");
+        deleteBtn.textContent="حذف";
+        deleteBtn.className="btn-delete";
+        deleteBtn.onclick=()=>{
+            if(confirm(`هل تريد حذف الكورس ${c.name}?`)){
+                courses.splice(i,1);
+                localStorage.setItem("courses",JSON.stringify(courses));
+                updateCourseSelect();
+                renderCourses();
+            }
+        };
+        div.appendChild(deleteBtn);
+        coursesList.appendChild(div);
+
+        // عرض الدروس
+        if(c.lessons){
+            c.lessons.forEach((lesson,j)=>{
+                let divLesson=document.createElement("div");
+                divLesson.textContent=`${lesson.title} (${c.name})`;
+                let deleteLessonBtn=document.createElement("button");
+                deleteLessonBtn.textContent="حذف";
+                deleteLessonBtn.className="btn-delete";
+                deleteLessonBtn.onclick=()=>{
+                    c.lessons.splice(j,1);
+                    localStorage.setItem("courses",JSON.stringify(courses));
+                    renderCourses();
+                };
+                divLesson.appendChild(deleteLessonBtn);
+                lessonsList.appendChild(divLesson);
+            });
+        }
+    });
+}
+renderCourses();
+
+// إضافة كورس
+addCourseForm.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    let title=courseTitleInput.value.trim();
+    if(title){
+        courses.push({name:title, lessons:[]});
+        localStorage.setItem("courses",JSON.stringify(courses));
+        courseTitleInput.value="";
+        updateCourseSelect();
+        renderCourses();
+    }
+});
+
+// إضافة درس
+addLessonForm.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    let courseIndex=selectCourse.value;
+    let title=lessonTitleInput.value.trim();
+    let video=lessonVideoInput.value.trim();
+    if(courseIndex!=="" && title && video){
+        if(!courses[courseIndex].lessons) courses[courseIndex].lessons=[];
+        courses[courseIndex].lessons.push({title,video});
+        localStorage.setItem("courses",JSON.stringify(courses));
+        lessonTitleInput.value="";
+        lessonVideoInput.value="";
+        renderCourses();
+    }
+});
+</script>
+
+</body>
+</html>
